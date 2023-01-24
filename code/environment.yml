@@ -1,4 +1,4 @@
-name: pytorch_lightning
+name: leewavenet
 channels:
   - anaconda
   - fastchan
