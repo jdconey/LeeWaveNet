@@ -5,16 +5,28 @@ Created on Tue Jan 24 15:43:08 2023
 @author: mm16jdc@leeds.ac.uk
 """
 
+import os
+import torch
+from torchvision.transforms import ToTensor
+import matplotlib.pyplot as plt
+
+from fastai.vision.all import *
+from fastai.data.transforms import get_files, RandomSplitter
+import pathlib
+#from fastai.vision.data import SegmentationDataLoaders, DataBlock, ImageBlock, MaskBlock
+#from fastai.vision.learner import unet_learner, cnn_learner
+#from fastai.vision.models import resnet34
+from fastai.learner import Learner
+import albumentations as A
+
 import xarray as xr
 from fastai.vision.all import *
 import numpy as np
-import pathlib
 
 
-root = pathlib.Path('~/data/ukv/train/')
-root = pathlib.Path('C:/Users/mm16jdc/Documents/GitHub/LeeWaveNet/data/ukv/train/')
 
-codes={0:'no wave',255:'lee wave'}
+root = pathlib.Path('C:/Users/mm16jdc/Documents/GitHub/LeeWaveNet/data/synthetic/train/')
+
 
 def label_func(fn): 
     string = str(fn.stem)[:49]+"mask.png"
@@ -25,23 +37,78 @@ def open_xarray(fname):
     array = x.values
     return array
 
-tfms = [Normalize.from_stats([0,0,0], [1,1,1]),
-    Flip(),
-    Zoom(max_zoom=20,p=0.5),Rotate(max_deg=360, p=0.9),
-  
-    ]
 
-waves_ds = DataBlock(blocks = (ImageBlock, MaskBlock(codes)),
-                  get_items = get_files,
-                  get_x=open_xarray,
-                  get_y = label_func,
-                  splitter=RandomSplitter(),
-                  batch_tfms=tfms,
-                    )
-dsets = waves_ds.datasets(root/'700hPa')
+fnames = get_files(root/"data")
 
-dls = waves_ds.dataloaders(root/"700hPa", path=root, bs=4)
+def open_np(fname):
+    x = np.load(fname)
+    
+    noise = np.random.normal(size=(512,512))
+    x = x + threshold*noise
+    x2 = np.array([x,x,x])
+    return torch.Tensor(x2)
 
-learn2 = unet_learner(dls,resnet34,metrics=DiceMulti)
-learn2.fine_tune(100,cbs=EarlyStoppingCallback(monitor='valid_loss', patience=5))
-learn2.export('~/models_out/segmodel.pkl')
+def label_func_wl(fn): 
+    string = str(fn.stem)[:49]+".npy"
+    lbl = np.load(root/"wavelength"/string).astype('float')#.tolist()
+    return lbl/1000
+
+def label_func_amp(fn): 
+    string = str(fn.stem)[:49]+".npy"
+    lbl = np.load(root/"amplitude"/string).astype('float')#.tolist()
+
+def label_func_or(fn): 
+    string = str(fn.stem)[:49]+".npy"
+    
+    lbl = np.load(root/"orientation"/string).astype('float')#.tolist()
+    lbl_rad = lbl*np.pi/180
+    return np.array([np.sin(lbl_rad),np.cos(lbl_rad)])
+
+
+def train(waves,characteristic):
+    dls = waves.dataloaders(root/"data", path=root, bs=2)
+    #learn3 = load_learner('~/models/segmodel.pkl')
+    learn3 = load_learner('C:/Users/mm16jdc/Documents/lee_waves_zenodo/models/learn2.pkl')
+    if characteristic != 'orientation':
+        learn3.model.layers[-2] = nn.Sequential(torch.nn.Conv2d(99, 50, kernel_size=(1, 1), stride=(1, 1)),torch.nn.ReLU(),torch.nn.Conv2d(50, 1, kernel_size=(1, 1), stride=(1, 1)))
+    learn3.dls = dls
+    learn3.loss_func =  MSELossFlat()
+    learn3.unfreeze()
+    learn3.freeze_to(-3)
+    base_lr = learn3.lr_find()[0]#1e-4
+    
+    print('lr',base_lr)
+    lr_mult = 10
+    learn3.unfreeze()
+    learn3.freeze_to(-3)
+    learn3.fit_one_cycle(100, slice(base_lr/lr_mult, base_lr),cbs=EarlyStoppingCallback(monitor='valid_loss', patience=5))
+    learn3.export('~/models_out/'+characteristic+'_'+str(threshold)+'.pkl')
+
+def amplitude():
+
+    waves = DataBlock(
+    blocks=(DataBlock, DataBlock),
+    get_items = get_files,
+    get_x=open_np,
+    get_y=label_func_amp,
+    splitter=RandomSplitter(),
+    batch_tfms=[Normalize.from_stats(*imagenet_stats)],
+)
+    
+    train(waves,'amplitude')
+    
+def wavelength():
+    
+
+    waves = DataBlock(
+    blocks=(DataBlock, DataBlock),
+    get_items = get_files,
+    get_x=open_np,
+    get_y=label_func_wl,
+    splitter=RandomSplitter(),
+    batch_tfms=[Normalize.from_stats(*imagenet_stats)],
+)
+    
+    train(waves,'wavelength')
+
+threshold = 0.0625

@@ -4,7 +4,7 @@ import os
 #this code has been adapted from a Jupyter Notebook created by Leif Denby
 
 train_or_test = 'train'
-no_of_examples = 50
+no_of_examples = 10
 
 root= '~/data/synthetic/'+train_or_test+'/'
 
