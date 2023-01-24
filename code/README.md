@@ -1,0 +1,1 @@
+The (rather bloated) conda environment used for this work is found in the environment.yml file. I hope to produce a slimmer version which contains only the necessary packages.
