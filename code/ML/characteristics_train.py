@@ -23,7 +23,7 @@ import xarray as xr
 from fastai.vision.all import *
 import numpy as np
 
-
+pathlib.PosixPath = pathlib.WindowsPath
 
 root = pathlib.Path('C:/Users/mm16jdc/Documents/GitHub/LeeWaveNet/data/synthetic/train/')
 
@@ -56,10 +56,10 @@ def label_func_wl(fn):
 def label_func_amp(fn): 
     string = str(fn.stem)[:49]+".npy"
     lbl = np.load(root/"amplitude"/string).astype('float')#.tolist()
+    return lbl
 
 def label_func_or(fn): 
     string = str(fn.stem)[:49]+".npy"
-    
     lbl = np.load(root/"orientation"/string).astype('float')#.tolist()
     lbl_rad = lbl*np.pi/180
     return np.array([np.sin(lbl_rad),np.cos(lbl_rad)])
@@ -75,7 +75,8 @@ def train(waves,characteristic):
     learn3.loss_func =  MSELossFlat()
     learn3.unfreeze()
     learn3.freeze_to(-3)
-    base_lr = learn3.lr_find()[0]#1e-4
+    base_lr = 1e-4
+   # base_lr = learn3.lr_find()[0]#1e-4
     
     print('lr',base_lr)
     lr_mult = 10
@@ -85,6 +86,8 @@ def train(waves,characteristic):
     learn3.export('~/models_out/'+characteristic+'_'+str(threshold)+'.pkl')
 
 def amplitude():
+    global threshold
+    threshold=0.0625
 
     waves = DataBlock(
     blocks=(DataBlock, DataBlock),
@@ -98,7 +101,8 @@ def amplitude():
     train(waves,'amplitude')
     
 def wavelength():
-    
+    global threshold
+    threshold = 0.125
 
     waves = DataBlock(
     blocks=(DataBlock, DataBlock),
@@ -110,5 +114,20 @@ def wavelength():
 )
     
     train(waves,'wavelength')
+    
+def orientation():
+    global threshold
+    threshold = 0.25
 
-threshold = 0.0625
+    waves = DataBlock(
+    blocks=(DataBlock, DataBlock),
+    get_items = get_files,
+    get_x=open_np,
+    get_y=label_func_or,
+    splitter=RandomSplitter(),
+    batch_tfms=[Normalize.from_stats(*imagenet_stats)],
+)
+    
+    train(waves,'orientation')
+
+

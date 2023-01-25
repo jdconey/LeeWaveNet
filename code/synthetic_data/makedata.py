@@ -6,7 +6,7 @@ import os
 train_or_test = 'train'
 no_of_examples = 10
 
-root= '~/data/synthetic/'+train_or_test+'/'
+root= '../../data/synthetic/'+train_or_test+'/'
 
 if not os.path.isdir(root+'data'):
     os.makedirs(root+'data')
