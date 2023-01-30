@@ -1,1 +1,0 @@
-You can create synthetic data using the `makedata.py` script in the `~/code/synthetic_data/` directory.
