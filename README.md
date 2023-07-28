@@ -9,10 +9,10 @@
  |______\___|\___| \/  \/ \__,_| \_/ \___|_| \_|\___|\__|
 ```
 
-Code and associated gubbins for lee wave detection and characterisation models.
+Code and links to data for lee wave detection and characterisation models.
 
-Read the paper: <link>
+Read the paper: <link to follow>
 
-Data & trained models can be downloaded from Zenodo: <link>
+Data & trained models can be downloaded from Zenodo: <link to follow>
 
-Any questions - mm16jdc at leeds dot eh see dot you kay 
+Any questions - mm16jdc at leeds dot ac dot uk
