@@ -11,8 +11,8 @@
 
 Code and links to data for lee wave detection and characterisation models.
 
-Read the paper: <link to follow>
+Read the paper (under review in QJRMetS): (link to follow)[]
 
-Data & trained models can be downloaded from Zenodo: <link to follow>
+Data & trained models can be downloaded from Zenodo: (link to follow)[]
 
 Any questions - mm16jdc at leeds dot ac dot uk
