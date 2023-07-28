@@ -96,7 +96,7 @@ def plot(ds,data='ukv'):
         proj=None
         xcoord='x'
         ycoord='y'
-    fig = plt.figure(figsize=(13,11))
+    fig = plt.figure(figsize=(13,10),layout='constrained')
     ax1 = fig.add_subplot(221,projection=proj)
     ax2 = fig.add_subplot(222,projection=proj)
     ax3 = fig.add_subplot(223,projection=proj)
@@ -127,10 +127,10 @@ def plot(ds,data='ukv'):
     
        #     scale=60
     headlength=3
-    headaxislength=2   #swet these to 0 for no arrows
+    headaxislength=2   #set these to 0 for no arrows
 
     width=0.004
-    ds2= quiver_orient(ds,sep=2,xcoord=xcoord,ycoord=ycoord)        
+    ds2= quiver_orient(ds,sep=16,xcoord=xcoord,ycoord=ycoord)        
             #now with arrows!!!!
     print(ds2)
     ds2.plot.quiver(xcoord,ycoord,'orient_u','orient_v',ax=ax4,
@@ -157,9 +157,9 @@ def plot(ds,data='ukv'):
             ax.coastlines('10m',alpha=0.5)
     if data=='ukv':
         forecast_time = str(ds['forecast_reference_time'].values)[:-10]+'Z'
-        fig.suptitle('Lee Wave Data: Characteristics Prediction '+forecast_time,y=.93)
+        fig.suptitle('Lee Wave Data: Characteristics Prediction '+forecast_time)
     if data=='synthetic':
-        fig.suptitle('Synthetic Wave Characteristic Prediction')
+        fig.suptitle('Synthetic Wave Characteristic Prediction',y=.93)
             
     plt.savefig('example_characteristics.pdf',bbox_inches='tight')
     
