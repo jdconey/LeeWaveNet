@@ -35,10 +35,10 @@ def open_np(f):
     
 
 def load_models():
-    learn2 = load_learner('C:/Users/mm16jdc/Documents/ukv_data/lee_waves_model/v2/learn2.pkl')
-    wavelength_model = load_learner('C:/Users/mm16jdc/Downloads/wl/kaggle_wavelength_pretrained_frozen_noise_0.125.pkl')
-    angle_model_v3 = load_learner('C:/Users/mm16jdc/Downloads/kaggle_orientation_pretrained_frozen_noise_0.25.pkl')
-    amp_model = load_learner('C:/Users/mm16jdc/Downloads/amplitude5_0.0625.pkl')
+    learn2 = load_learner('SEGMODEL.pkl')
+    wavelength_model = load_learner('wavelength_model_0.125.pkl')
+    angle_model_v3 = load_learner('orientation_pretrained_frozen_noise_0.25.pkl')
+    amp_model = load_learner('amplitude5_0.0625.pkl')
     return {'segmentation':learn2,
             'wavelength':wavelength_model,
             'orientation':angle_model_v3,
@@ -88,7 +88,7 @@ def quiver_orient(dataset,sep=32,xcoord='projection_x_coordinate',ycoord='projec
 
 def plot(ds,data='ukv'):
     if data=='ukv':
-        with open('C:/Users/mm16jdc/Documents/lee_waves_zenodo/data/projection/crs.pkl', 'rb') as projfile:
+        with open('lee_waves_zenodo/data/projection/crs.pkl', 'rb') as projfile:
             proj=pickle.load(projfile)
         xcoord='projection_x_coordinate'
         ycoord='projection_y_coordinate'
@@ -165,9 +165,9 @@ def plot(ds,data='ukv'):
     
 
 
-leewaves = open_xarray('C:/Users/mm16jdc/Documents/lee_waves_zenodo/data/test_feb/vertical_velocities/20210214T0900Z-PT0000H00M-wind_vertical_velocity_at_700hPa.nc')
+leewaves = open_xarray('20210214T0900Z-PT0000H00M-wind_vertical_velocity_at_700hPa.nc')
 
-#synthetic = np.load('C:/Users/mm16jdc/Documents/ukv_data/data5_test/data/37.npy')
+#synthetic = np.load('37.npy')
 #ds=xr.Dataset({'upward_air_velocity':(('y','x'),synthetic)},coords={'x':np.arange(0,512,1),'y':np.arange(0,512,1)})
 
 models = load_models()
