@@ -14,7 +14,7 @@
 
 Code and links to data for lee wave detection and characterisation models.
 
-Read the paper (under review in QJRMetS): [https://doi.org10.1002/qj.4592](https://doi.org10.1002/qj.4592)
+Read the paper in QJRMetS: [https://doi.org10.1002/qj.4592](https://doi.org10.1002/qj.4592)
 
 Data can be downloaded from [Zenodo](https://doi.org/10.5281/zenodo.7565310), and you can train models using the code here.
 
