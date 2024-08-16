@@ -69,8 +69,6 @@ def train(waves,characteristic):
     dls = waves.dataloaders(root/"data", path=root, bs=2)
     #learn3 = load_learner('~/models/segmodel.pkl')
     learn3 = load_learner('C:/Users/mm16jdc/Documents/lee_waves_zenodo/models/learn2.pkl')
-    if characteristic != 'orientation':
-        learn3.model.layers[-2] = nn.Sequential(torch.nn.Conv2d(99, 50, kernel_size=(1, 1), stride=(1, 1)),torch.nn.ReLU(),torch.nn.Conv2d(50, 1, kernel_size=(1, 1), stride=(1, 1)))
     learn3.dls = dls
     learn3.loss_func =  MSELossFlat()
     learn3.unfreeze()
@@ -84,6 +82,20 @@ def train(waves,characteristic):
     learn3.freeze_to(-3)
     learn3.fit_one_cycle(100, slice(base_lr/lr_mult, base_lr),cbs=EarlyStoppingCallback(monitor='valid_loss', patience=5))
     learn3.export('~/models_out/'+characteristic+'_'+str(threshold)+'.pkl')
+
+def train_orientation(waves):
+    dls = waves.dataloaders(root/"data", path=root, bs=2)
+    learn3 = load_learner('../input/learn2/learn2.pkl')
+    m = learn3.model
+    or_model = Learner(dls,m,loss_func=loss_func)
+    base_lr = 1e-4
+
+    print('lr',base_lr)
+    lr_mult = 10
+    or_model.unfreeze()
+    or_model.freeze_to(-3)
+    or_model.fit_one_cycle(100, slice(base_lr/lr_mult, base_lr),cbs=EarlyStoppingCallback(monitor='valid_loss', patience=5))
+    or_model.export('~/models_out/orientation_'+str(threshold)+'.pkl')
 
 def amplitude():
     global threshold
@@ -128,6 +140,6 @@ def orientation():
     batch_tfms=[Normalize.from_stats(*imagenet_stats)],
 )
     
-    train(waves,'orientation')
+    train_orientation(waves)
 
 
