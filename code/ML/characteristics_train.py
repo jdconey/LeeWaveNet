@@ -67,8 +67,8 @@ def label_func_or(fn):
 
 def train(waves,characteristic):
     dls = waves.dataloaders(root/"data", path=root, bs=2)
-    #learn3 = load_learner('~/models/segmodel.pkl')
-    learn3 = load_learner('C:/Users/mm16jdc/Documents/lee_waves_zenodo/models/learn2.pkl')
+    learn3 = load_learner('~/models/segmodel.pkl')
+    learn3.model.layers[-2] = nn.Sequential(torch.nn.Conv2d(99, 50, kernel_size=(1, 1), stride=(1, 1)),torch.nn.ReLU(),torch.nn.Conv2d(50, 1, kernel_size=(1, 1), stride=(1, 1)))
     learn3.dls = dls
     learn3.loss_func =  MSELossFlat()
     learn3.unfreeze()
@@ -85,7 +85,7 @@ def train(waves,characteristic):
 
 def train_orientation(waves):
     dls = waves.dataloaders(root/"data", path=root, bs=2)
-    learn3 = load_learner('../input/learn2/learn2.pkl')
+    learn3 = load_learner('~/models/segmodel.pkl')
     m = learn3.model
     or_model = Learner(dls,m,loss_func=loss_func)
     base_lr = 1e-4
